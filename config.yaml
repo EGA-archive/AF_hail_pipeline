@@ -54,6 +54,8 @@ mt_afterQC: "work/test_afterQC.mt"
 # MatrixTable after QC steps.
 # Docker path: /data/work/filename_afterQC.mt
 
+mt_unrelated_individuals: ""
+
 final_vcf_AF: "output/test_afterHail.vcf.bgz"
 # Final output VCF annotated with recalculated allele frequencies.
 # Only relevant when af_annotation = true.

@@ -155,40 +155,39 @@ def delete_related_indv(mt, mt_filtered):
 
 def delete_related_samples(mt):
     """
-    Calls all relatedness functions.
-    Deletes:
-      - KING high-kinship samples (duplicates/twins)
-      - PC-relate inferred related samples
+    Calls all the relatedness module function. Deletes the samples inferred by King. 
+    :params: mt with related samples
+    :return: mt without related samples
     """
-    initialize_relatedness_report()
-
+   
     mt_qual, n_var = quality_control(mt)
-    mt_filtered = subset_100000(mt_qual, n_var[0])
 
+    mt_filtered = subset_100000(mt_qual, n_var[0])
+    
     twins_table = find_high_kin_score(mt_filtered)
-    append_king_results_to_file(twins_table)
 
     mt = delete_related_indv(mt, mt_filtered)
 
     if twins_table.count() != 0:
-        # remove one side of each KING pair; currently removes the second sample in each kept pair
-        samples_to_remove = twins_table.aggregate(hl.agg.collect_as_set(twins_table.s))
+        samples_to_remove = twins_table.aggregate(hl.agg.collect_as_set(twins_table.s)) # Remove the high kinship score samples
         set_to_remove = hl.literal(samples_to_remove)
-        mt = mt.filter_cols(~set_to_remove.contains(mt.s))
+        mt = mt.filter_cols(~set_to_remove.contains(mt['s']))
 
-    after_rel_trim = mt.count()
+    after_rel_trim = mt.count() 
 
-    logging.info(
-        f"Dataset size after relatedness trimming. "
-        f"Variants: {after_rel_trim[0]}, Samples: {after_rel_trim[1]}"
-    )
-
+    logging.info(f"Dataset size after relatedness trimming. Variants: {after_rel_trim[0]}, Samples: {after_rel_trim[1]}   ")
     if config['verbosity']:
-        summary = []
-        summary.append(["Dataset size after relatedness trimming", after_rel_trim[0], after_rel_trim[1]])
-        csv_writer(summary)
+            summary = []
+            summary.append(["Dataset size after relatedness trimming", after_rel_trim[0], after_rel_trim[1]])
+            csv_writer(summary)
 
-    return mt
+    # Save the final MatrixTable after removing related samples.
+    output_path = config['mt_unrelated_individuals']
+    mt.write(output_path, overwrite=False)
+    logging.info(f"MatrixTable saved to: {output_path}")
+
+    return mt 
+
 
 
 """mt = hl.read_matrix_table(config['mt_from_vcf'])
