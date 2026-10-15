@@ -140,14 +140,16 @@ def genotype_filtering(mt):
         logging.warning("GQ threshold not set - GQ filtering not performed ")
 
     # AB filtering
-    if config['genotype_filters']['AB_threshold'] is not None:
+    if (
+        config['genotype_filters']['AB_threshold_lower'] is not None and
+        config['genotype_filters']['AB_threshold_upper'] is not None
+    ):
         if "GT" in mt.entry and "AD" in mt.entry:
-            
-            # Apply AB annotation and filtering
+
             mt = mt.annotate_entries(
                 AB=hl.or_missing(
                     mt.GT.is_het(),
-                    mt.AD[1] / hl.sum(mt.AD) # Calculate AB 
+                    mt.AD[1] / hl.sum(mt.AD)
                 )
             )
 
@@ -173,11 +175,19 @@ def genotype_filtering(mt):
                     'n': pre_ab_stats.basic_stats.n
                 }
             
-            mt = mt.annotate_entries( # set non passing GT to NULL 
-                GT = hl.case()
-                .when(mt.GT.is_het() & (mt.AB < config['genotype_filters']['AB_threshold']), hl.null(mt.GT.dtype)) # filter ONLY het genotypes by AB
-                .default(mt.GT)
+                mt = mt.annotate_entries(
+                    GT=hl.case()
+                    .when(
+                        mt.GT.is_het() &
+                        (
+                            (mt.AB < config['genotype_filters']['AB_threshold_lower']) |
+                            (mt.AB > config['genotype_filters']['AB_threshold_upper'])
+                        ),
+                        hl.null(mt.GT.dtype)
+                    )
+                    .default(mt.GT)
             )
+
             logging.info("AB filtering done")
             
             if config['verbosity']:

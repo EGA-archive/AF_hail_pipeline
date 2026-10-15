@@ -81,7 +81,7 @@ use_allele_counts: true
 ## - infer_ancestry and submit_ancestry are mutually exclusive
 ## ============================================================
 
-preprocessing: false
+preprocessing: true
 # Runs preprocessing: VCF conversion, splitting, and initial filtering.
 
 infer_sex: false
@@ -117,14 +117,14 @@ af_annotation: false
 ## Then enable filtering steps as needed.
 ## ============================================================
 
-convert_vcfs: false
+convert_vcfs: true
 # Convert input VCFs into a Hail MatrixTable.
 # Must be true on first run.
 
 split_multiallelic: false
 # Split multiallelic variants into biallelic rows.
 
-genotype_filtering: false
+genotype_filtering: true
 # Apply genotype-level filters using genotype_filters below.
 
 variant_filtering: false
@@ -170,10 +170,14 @@ variant_filters:
 ## ============================================================
 
 genotype_filters:
-  GQ_threshold: 20
+  GQ_threshold: #20
   # Genotype Quality. Calls below this are set to missing.
 
-  AB_threshold: #0.2
+  AB_threshold_lower: 0.2
+  # Allele Balance for heterozygous calls.
+  # Calls below this threshold are set to missing.
+
+  AB_threshold_upper: 0.8
   # Allele Balance for heterozygous calls.
   # Calls below this threshold are set to missing.
 
