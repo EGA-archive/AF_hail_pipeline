@@ -268,7 +268,11 @@ genotype_filters:
   GQ_threshold: 20
   # Genotype Quality. Calls below this are set to missing.
 
-  AB_threshold: 0.2
+  AB_threshold_lower: 0.2
+  # Allele Balance for heterozygous calls.
+  # Calls below this threshold are set to missing.
+
+  AB_threshold_upper: 0.8
   # Allele Balance for heterozygous calls.
   # Calls below this threshold are set to missing.
 
