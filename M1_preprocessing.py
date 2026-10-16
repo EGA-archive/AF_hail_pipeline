@@ -520,7 +520,7 @@ def sample_filtering_hard_thresholds(mt, sequencingType, basename):
 def sample_filtering_mad_thresholds(mt, sequencingType, basename): # TODO Clean this function  # TODO merge when possible with hard thresholds # TODO make alle the plots in one go, adding both hard and mad thresholds 
     """
     Applies sample quality control using MAD-based thresholds following the gnomAD strategy.
-    Thresholds are computed from the full dataset before any filtering is applied.
+    Thresholds are computed the hard thresholds filtering is applied.
     :params: mt without sample qc
     :return: mt with sample QCedCHARR_threshold
     """
